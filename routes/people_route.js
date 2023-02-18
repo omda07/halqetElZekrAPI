@@ -10,7 +10,7 @@ const peopleCtr = require("../controllers/peopleController");
 // ____________________________GETTING_________________________________
 
 // get CheckIn middleware
-router.get("/allPeople", peopleCtr.getChecklist);
+router.get("/allPeople", peopleCtr.getAllPeople);
 // router.get("/userChecklist", [auth, checklistCtrl.getUserChecklist]);
 // router.get("/checklistById", [auth, checklistCtrl.getChecklistById]);
 // get CheckOut middleware
