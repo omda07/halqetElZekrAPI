@@ -9,11 +9,11 @@ const ObjectId = mongoose.Types.ObjectId;
 const peopleCtr = {
   // * _________________________________GET FUNCTION_____________________________________________
 
-  getChecklist: async (req, res, next) => {
-    let time;
+  getAllPeople: async (req, res, next) => {
+    let people;
     try {
-      time = await People.find().select("-__v");
-      if (!time) {
+      people = await People.find({approved:true}).select("-__v");
+      if (!people) {
         return res
           .status(404)
           .json({ status: false, message: "Cannot find people" });
@@ -21,7 +21,7 @@ const peopleCtr = {
 
       return res
         .status(200)
-        .json({ status: true, message: "Success", checklist: time });
+        .json({ status: true, message: "Success", peoples: people });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
