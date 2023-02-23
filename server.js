@@ -6,7 +6,9 @@ const mongoose = require("mongoose");
 const logger = require("./config/logger");
 const app = express();
 const compression = require("compression");
-
+const morgan = require("morgan");
+const helmet = require("helmet");
+const cors = require("cors");
 
 
 //* initial start
@@ -39,7 +41,14 @@ const connectDB = async () => {
 //   .catch((error) => logger.error(error));
 
 //* copmresed requests
+app.use(helmet());
+//* copmresed requests
+app.use(morgan('combined'));
+//* copmresed requests
 app.use(compression());
+app.use(
+  cors()
+);
 
 //* import user routes
 const user = require("./routes/users");
