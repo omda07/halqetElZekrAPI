@@ -48,12 +48,16 @@ const peopleCtr = {
   // * ______________________________________CREATE FUNCTION__________________________
 
   createName: async (req, res, next) => {
-
+uId = req.body.uId;
+if(!uId){
+  return res.status(400).json({ status: false, message: 'Please add you device Id!' });
+}
     let newName;
     try {
   
       const orders = new People({
      name:req.body.name,
+     uid:req.body.uId,
 
       });
 

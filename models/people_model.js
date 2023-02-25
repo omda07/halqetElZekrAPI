@@ -5,9 +5,12 @@ const peopleSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      require:true
+
     },
     uid: {
       type: String,
+      require:true
     },
 
     approved: {
