@@ -12,6 +12,7 @@ const peopleSchema = new mongoose.Schema(
 
     approved: {
       type: Boolean,
+      default:false
     },
     
    

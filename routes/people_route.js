@@ -29,12 +29,12 @@ router.get("/allPeople", peopleCtr.getAllPeople);
 //* ________________________________CREATE_________________________________________
 
 // Creating one Course
-// router.post("/newChecklist",  checklistCtrl.createChecklist);
+router.post("/newName",  peopleCtr.createName);
 // router.post('/newCheckOut', [auth,timeCtrl.createCheckOut])
 
 //? ____________________________________UPDATE____________________________________________
 
-// router.patch('/updateChecklist', [auth,checklistCtrl.updateChecklist])
+router.patch('/approveName',peopleCtr.updatePeople)
 // router.patch('/updateChecks', [auth,checklistCtrl.updateChecks])
 // router.patch('/updateRemoveChecklistAssignee', [auth,checklistCtrl.updateRemoveChecklistAssignee])
 
@@ -45,5 +45,6 @@ router.get("/allPeople", peopleCtr.getAllPeople);
 // router.delete('/deleteChecklist', [auth,checklistCtrl.deleteChecklist])
 
 //! Deleting course
+router.delete('/deleteName',peopleCtr.deletePeople)
 
 module.exports = router;

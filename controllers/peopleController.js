@@ -26,113 +26,29 @@ const peopleCtr = {
       return res.status(500).json({ status: false, message: err.message });
     }
   },
-  getUserChecklist: async (req, res, next) => {
-    const token = req.header("x-auth-token");
-    const repo = req.query.repo;
-    const ownChecklist = req.query.ownChecklist;
-
-    try {
-      const user = jwt.verify(token, "privateKey");
-      console.log(repo);
-      const id = user.id;
-      console.log(id);
-      console.log(user.isAdmin);
-
-      time = await Checklist.find(
-        
-        user.isAdmin == true
-          ? { reporter: ObjectId(id), own: ownChecklist }
-          : { assignee: ObjectId(id), own: ownChecklist }
-      )
-        .populate(
-          "assignee reporter",
-          "-__v -email -isAdmin -password -checklist"
-        )
-        .select("-__v");
-
-      if (!time) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Cannot find checklists" });
-      }
-
-      return res
-        .status(200)
-        .json({ status: true, message: "Success", checklist: time });
-    } catch (err) {
-      return res.status(500).json({ status: false, message: err.message });
-    }
-  },
-  getChecklistById: async (req, res, next) => {
-    const token = req.header("x-auth-token");
-    const checklistId = req.query.checklistId;
-
-    try {
-      const user = jwt.verify(token, "privateKey");
-      const id = user.id;
-      console.log(id);
-
-      time = await Checklist.findOne({_id:ObjectId(checklistId)} )
-        .populate(
-          "assignee reporter",
-          "-__v -email -isAdmin -password -checklist"
-        )
-        .select("-__v");
-        let count  =0;
-        let lengthChecked = time.checks.length;
-        for(let i = 0;i<time.checks.length;i++){
-          if(time.checks[i].ckecked == true){
-            count++;
-           
-          }
-        }
-        console.log(count);
-      if (!time) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Cannot find checklists" });
-      }
-
-      return res
-        .status(200)
-        .json({ status: true, message: "Success", checklist: time ,length:lengthChecked ,checkedCount:count});
-    } catch (err) {
-      return res.status(500).json({ status: false, message: err.message });
-    }
-  },
+ 
 
   // * ______________________________________CREATE FUNCTION__________________________
 
-  createChecklist: async (req, res, next) => {
-    const token = req.header("x-auth-token");
-    const ownChecklist = req.body.own;
+  createName: async (req, res, next) => {
 
-    let newOrder;
+    let newName;
     try {
-      const user = jwt.verify(token, "privateKey");
-      const id = user.id;
-      console.log(id);
+  
+      const orders = new People({
+     name:req.body.name,
 
-      const orders = new Checklist({
-        checklistName: req.body.checklistName,
-        checks: req.body.checks,
-        assignee: ownChecklist == true ? ObjectId(id) : req.body.assignee,
-        reporter: ObjectId(id),
-        own: req.body.own,
       });
 
-      newOrder = await orders.save();
+      newName = await orders.save();
 
-      getChecklist = await Checklist.findOne({_id:ObjectId(newOrder.id)} )
-      .populate(
-        "assignee reporter",
-        "-__v -email -isAdmin -password -checklist"
-      )
+      getAllPeople = await People.findOne({_id:ObjectId(newName.id)} )
+      
       .select("-__v");
       // res.newtime = newtime
       return res
         .status(201)
-        .json({ status: true, message: "Success", checklist: getChecklist});
+        .json({ status: true, message: "Success", People: getAllPeople});
     } catch (err) {
       console.log(err);
       return res.status(400).json({ status: false, message: err });
@@ -141,36 +57,27 @@ const peopleCtr = {
 
   // ? ______________________________________UPDATE FUNCTION_____________________________
 
-  updateChecklist: async (req, res) => {
+  updatePeople: async (req, res) => {
     const { id, name, assign } = req.body;
-    const token = req.header("x-auth-token");
     try {
-      const user = jwt.verify(token, "privateKey");
 
-      const check = await Checklist.findById(ObjectId(id));
-      console.log(name);
-      console.log(assign);
+      const check = await People.findById(ObjectId(id));
+
 
       if (check) {
-        if (check.reporter == user.id) {
-          const result = await Checklist.updateOne(
+      
+          const result = await People.updateOne(
             {
               _id: req.body.id,
             },
             {
               $set: {
-                checklistName: req.body.name,
-                assignee: req.body.assign,
+                approved:true,
               },
             }
           );
           console.log(result);
           return res.json({ status: true, message: "Accepted" });
-        } else {
-          return res
-            .status(403)
-            .json({ status: false, message: "You are not allowed" });
-        }
       } else {
         return res.status(404).json({ status: false, message: "not found" });
       }
@@ -187,11 +94,11 @@ const peopleCtr = {
     try {
       const user = jwt.verify(token, "privateKey");
 
-      const check = await Checklist.findById(ObjectId(id));
+      const check = await People.findById(ObjectId(id));
    
 
       if (check) {
-        const   result = await Checklist.updateOne(
+        const   result = await People.updateOne(
           {
             _id:req.body.id,
             "checks": { "$elemMatch": { "_id":  req.body.checksId  }}
@@ -218,7 +125,7 @@ const peopleCtr = {
     }
   },
 
-  updateRemoveChecklistAssignee: async (req, res) => {
+  updateRemovePeopleAssignee: async (req, res) => {
     const { id, assign } = req.body;
     const removeAssignee = req.query.removeAssignee;
     const addAssigne = req.query.addAssigne;
@@ -230,13 +137,13 @@ const peopleCtr = {
     try {
       const user = jwt.verify(token, "privateKey");
 
-      const check = await Checklist.findById(ObjectId(id));
+      const check = await People.findById(ObjectId(id));
 
       let result;
       if (check) {
         if (check.reporter == user.id) {
           if (removeAssignee == "true") {
-            result = await Checklist.updateOne(
+            result = await People.updateOne(
               {
                 _id: req.body.id,
               },
@@ -248,7 +155,7 @@ const peopleCtr = {
             );
           } else if (addChecks == "true") {
             console.log(req.body.title);
-            result = await Checklist.updateOne(
+            result = await People.updateOne(
               {
                 _id: req.body.id,
               },
@@ -263,7 +170,7 @@ const peopleCtr = {
               }
             );
           }else if (updateCheck ==  'true'){
-            const   result = await Checklist.updateOne(
+            const   result = await People.updateOne(
               {
                 _id:req.body.id,
                 "checks": { "$elemMatch": { "_id":  req.body.checksId  }}
@@ -281,7 +188,7 @@ const peopleCtr = {
             );
           } else if (removeChecks == "true") {
             console.log(req.body.title);
-            result = await Checklist.updateOne(
+            result = await People.updateOne(
               {
                 _id: req.body.id,
               },
@@ -294,7 +201,7 @@ const peopleCtr = {
               }
             );
           } else if (addAssigne == "true") {
-            result = await Checklist.updateOne(
+            result = await People.updateOne(
               {
                 _id: req.body.id,
               },
@@ -323,24 +230,16 @@ const peopleCtr = {
 
   // ! __________________________________________DELETE FINCTION____________________________
 
-  deleteChecklist: async (req, res) => {
+  deletePeople: async (req, res) => {
     const { id } = req.body;
-    const token = req.header("x-auth-token");
     try {
-      const check = await Checklist.findById(ObjectId(id));
-      const user = jwt.verify(token, "privateKey");
+      const check = await People.findById(ObjectId(id));
       if (check) {
-        if (check.reporter == user.id) {
-          const result = await Checklist.deleteOne({
-            _id: req.body.id,
-          });
-          console.log(result);
-          return res.json({ status: true, message: "Deleted" });
-        } else {
-          return res
-            .status(403)
-            .json({ status: false, message: "You are not allowed" });
-        }
+        const result = await People.deleteOne({
+          _id: req.body.id,
+        });
+        console.log(result);
+        return res.json({ status: true, message: "Deleted" });
       } else {
         return res.status(404).json({ status: false, message: "Not found" });
       }
