@@ -190,12 +190,14 @@ const userCtrl = {
 
   allUsers: async (req, res) => {
     try {
+
+      const count = await Users.count();
       const users = await Users.find()
         
         .select("-password -__v");
       return res
         .status(200)
-        .json({ status: true, message: "Get users", users });
+        .json({ status: true, message: "Get users", users ,count});
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }

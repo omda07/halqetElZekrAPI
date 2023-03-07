@@ -3,6 +3,8 @@ const userCtrl = require("../controllers/userController");
 
 const router = express.Router();
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
+
 
 //*______________________________GETTIG_____________________________
 
@@ -39,6 +41,6 @@ router.patch("/updateProfile", [auth, userCtrl.updateProfile]);
 
 //! ___________________________________DELETE__________________________________________
 
-router.delete("/deleteUser", [auth, userCtrl.deleteUser]);
+router.delete("/deleteUser", [auth,admin, userCtrl.deleteUser]);
 
 module.exports = router;

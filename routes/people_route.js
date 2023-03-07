@@ -36,7 +36,7 @@ router.post("/newName",  peopleCtr.createName);
 
 //? ____________________________________UPDATE____________________________________________
 
-router.patch('/approveName',peopleCtr.updatePeople)
+router.patch('/approveName',[auth,admin,peopleCtr.updatePeople])
 // router.patch('/updateChecks', [auth,checklistCtrl.updateChecks])
 // router.patch('/updateRemoveChecklistAssignee', [auth,checklistCtrl.updateRemoveChecklistAssignee])
 
@@ -47,6 +47,6 @@ router.patch('/approveName',peopleCtr.updatePeople)
 // router.delete('/deleteChecklist', [auth,checklistCtrl.deleteChecklist])
 
 //! Deleting course
-router.delete('/deleteName',peopleCtr.deletePeople)
+router.delete('/deleteName',[auth,admin,peopleCtr.deletePeople])
 
 module.exports = router;
