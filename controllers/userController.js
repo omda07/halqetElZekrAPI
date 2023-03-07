@@ -16,13 +16,13 @@ const userCtrl = {
       //* find the user info by his id and not show the password in response
 
       const user = await Users.findOne({ _id: ObjectId(req.params.id) })
-        .populate("checklist", "-__v")
+       
         .select("-password -__v ");
       console.log(req.params.id);
       console.log(user);
       return res
         .status(200)
-        .json({ status: "ok", message: "get user success", profile: user });
+        .json({ status: true, message: "Get user success", profile: user });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ status: false, message: error.message });
@@ -36,8 +36,6 @@ const userCtrl = {
       userName,
       email,
       password: plainTextPassword,
-      phone,
-      phoneId,
     } = req.body;
     // console.log(userName.replace(/\s+/g, ''))
     //   let userNameCheck =userName.replace(/\s+/g, '')
@@ -72,7 +70,7 @@ const userCtrl = {
     try {
       //* take from user userName , email and password and not care for any value else
       user = new Users(_.pick(req.body, ["userName", "email", "password"]));
-      console.log(phoneId);
+   
 
       //* crypt the password using bcrypt package
       user.password = await bcrypt.hash(plainTextPassword, 10);
@@ -99,7 +97,7 @@ const userCtrl = {
         token: token,
       });
     } catch (error) {
-      return res.status(500).json({ status: false, message: error.message });
+      return res.status(500).json({ status: false, message:[ error.message] });
     }
   },
 
@@ -163,7 +161,7 @@ const userCtrl = {
         isAdmin: user.isAdmin,
       });
     } catch (error) {
-      return res.status(500).json({ status: false, message: error.message });
+      return res.status(500).json({ status: false, message: [error.message] });
     }
   },
 
@@ -177,7 +175,7 @@ const userCtrl = {
 
       //* find the user info by his id and not show the password at response
       const profile = await Users.findById(id)
-        .populate("checklist", "-__v")
+        
         .select("-password -__v ");
       console.log(req.params.id);
       console.log(profile);
@@ -194,10 +192,10 @@ const userCtrl = {
     try {
       const users = await Users.find()
         
-        .select("-password -__v -checklist");
+        .select("-password -__v");
       return res
         .status(200)
-        .json({ status: true, message: "get users", users });
+        .json({ status: true, message: "Get users", users });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
@@ -207,9 +205,9 @@ const userCtrl = {
     let search = req.params.search;
     try {
       const users = await Users.find({ userName: search })
-        .populate("checklist")
+
         .select("-password -__v ");
-      return res.status(200).json({ status: true, message: "get user", users });
+      return res.status(200).json({ status: true, message: "Get user", users });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
@@ -219,7 +217,7 @@ const userCtrl = {
     let search = req.params.search;
     try {
       const users = await Users.count();
-      return res.status(200).json({ status: true, message: "get user", users });
+      return res.status(200).json({ status: true, message: "Get user", users });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
@@ -303,7 +301,7 @@ const userCtrl = {
     const token = req.header("x-auth-token");
     const userName = req.query.userName;
     const noId = req.query.noId;
-    const department = req.query.department;
+    const email = req.query.email;
 
 
     try {
@@ -335,14 +333,14 @@ const userCtrl = {
                 },
               }
             );
-          }else if(department == 'true'){
+          }else if(email == 'true'){
             result = await Users.updateOne(
               {
                 _id: user.id,
               },
               {
                 $set: {
-                  department: req.body.department
+                  email: req.body.email
                 },
               }
             );

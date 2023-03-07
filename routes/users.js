@@ -7,7 +7,7 @@ const auth = require("../middleware/auth");
 //*______________________________GETTIG_____________________________
 
 //* middleware auth check first if user loged in and have a token
-router.get("/get-profile", auth, userCtrl.profile);
+router.get("/profile", auth, userCtrl.profile);
 
 // Getting Author Contents
 router.get("/profile/:id", userCtrl.getUserId);
