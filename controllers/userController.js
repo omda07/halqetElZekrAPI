@@ -34,7 +34,6 @@ const userCtrl = {
     //* register by phone or userName just change email below to phone or userName
     const {
       userName,
-      email,
       password: plainTextPassword,
     } = req.body;
     // console.log(userName.replace(/\s+/g, ''))
@@ -59,17 +58,17 @@ const userCtrl = {
 
     //* check in database by email
     //* register by phone or userName just change email below to phone or userName
-    let user = await Users.findOne({ email }).lean();
+    let user = await Users.findOne({ userName }).lean();
 
     //* if exist return an error messge
     if (user) {
       return res
         .status(400)
-        .json({ status: false, message:[ "email already in use"] });
+        .json({ status: false, message:[ "UserName already in use"] });
     }
     try {
       //* take from user userName , email and password and not care for any value else
-      user = new Users(_.pick(req.body, ["userName", "email", "password"]));
+      user = new Users(_.pick(req.body, ["userName", "password"]));
    
 
       //* crypt the password using bcrypt package
@@ -93,7 +92,6 @@ const userCtrl = {
         message: ["Register Success"],
         id: user._id,
         userName: user.userName,
-        email: user.email,
         token: token,
       });
     } catch (error) {
@@ -103,7 +101,7 @@ const userCtrl = {
 
   login: async (req, res) => {
     //* take the inputs from user and validate them
-    const { email, password: plainTextPassword } = req.body;
+    const { userName, password: plainTextPassword } = req.body;
 
     const validateError = validateUserLogin(req.body);
 
@@ -123,13 +121,13 @@ const userCtrl = {
     }
 
     //* check in database by email
-    let user = await Users.findOne({ email }).lean();
+    let user = await Users.findOne({ userName }).lean();
 
     //* if not exist return an error messge
     if (!user) {
       return res
         .status(400)
-        .json({ status: false, message: ["Invalid email or password"] });
+        .json({ status: false, message: ["Invalid userName"] });
     }
 
     try {
@@ -143,7 +141,7 @@ const userCtrl = {
       if (!checkPassword) {
         return res
           .status(400)
-          .json({ status: false, message: ["Invalid email or password" ]});
+          .json({ status: false, message: ["Invalid userName or password" ]});
       }
 
       //* generate token that have his id and if admin or not

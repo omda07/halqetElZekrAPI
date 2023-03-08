@@ -6,9 +6,8 @@ const joiPassword = joi.extend(joiPasswordExtendCore);
 
 // *schema like model of user
 const UserSchema = new mongoose.Schema({
-  userName: { type: String, minlength: 3, maxlength: 44 },
+  userName: { type: String, minlength: 3, maxlength: 44 ,unique : true,required:true},
   noId: { type: String, default: "" },
-  email: { type: String, lowercase: true, required: true, maxlength: 1024 },
   password: { type: String, required: true, minlength: 8, maxlength: 1024 },
   isAdmin: { type: Boolean, default: false   },
 
@@ -21,14 +20,8 @@ function validateUser(user) {
       userName: joi
         .string()
         .min(3)
-        .max(44)
+        .max(44).required().trim()
         .lowercase(),
-      email: joi
-        .string()
-        .email()
-        .max(1024)
-        .required()
-        .trim(),
 
       password: joiPassword
         .string()
@@ -53,13 +46,11 @@ function validateUser(user) {
 function validateUserLogin(user) {
   const JoiSchema = joi
     .object({
-      email: joi
-        .string()
-        .email()
-        .min(3)
-        .max(256)
-        .required()
-        .trim(),
+      userName: joi
+      .string()
+      .min(3)
+      .max(44).required().trim()
+      .lowercase(),
 
       password: joiPassword
         .string()
