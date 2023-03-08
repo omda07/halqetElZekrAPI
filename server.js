@@ -54,7 +54,9 @@ app.use(
 const user = require("./routes/users");
 app.use("/api/user", user);
 
-
+//* import user routes
+const khatma = require("./routes/khatma_route");
+app.use("/api/khatma", khatma);
 
 const people = require("./routes/people_route");
 app.use("/api/people", people);

@@ -12,7 +12,9 @@ const peopleCtr = {
   getAllPeople: async (req, res, next) => {
     let people;
     try {
-      people = await People.find({approved:true}).sort({createdAt:-1}).select("-__v");
+      people = await People.find({ approved: true })
+        .sort({ createdAt: -1 })
+        .select("-__v");
       if (!people) {
         return res
           .status(404)
@@ -26,11 +28,11 @@ const peopleCtr = {
       return res.status(500).json({ status: false, message: err.message });
     }
   },
- 
+
   getPeople: async (req, res, next) => {
     let people;
     try {
-      people = await People.find().sort({createdAt:-1}).select("-__v");
+      people = await People.find().sort({ createdAt: -1 }).select("-__v");
       if (!people) {
         return res
           .status(404)
@@ -48,28 +50,27 @@ const peopleCtr = {
   // * ______________________________________CREATE FUNCTION__________________________
 
   createName: async (req, res, next) => {
-uId = req.body.uId;
-if(!uId){
-  return res.status(400).json({ status: false, message: 'Please add you device Id!' });
-}
+    uId = req.body.uId;
+    if (!uId) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Please add you device Id!" });
+    }
     let newName;
     try {
-  
       const orders = new People({
-     name:req.body.name,
-     uid:req.body.uId,
-
+        name: req.body.name,
+        uid: req.body.uId,
       });
 
       newName = await orders.save();
 
-      getAllPeople = await People.findOne({_id:ObjectId(newName.id)} )
-      
+      getAllPeople = await People.findOne({ _id: ObjectId(newName.id) })
       .select("-__v");
       // res.newtime = newtime
       return res
         .status(201)
-        .json({ status: true, message: "Success", People: getAllPeople});
+        .json({ status: true, message: "Success", People: getAllPeople });
     } catch (err) {
       console.log(err);
       return res.status(400).json({ status: false, message: err });
@@ -81,24 +82,21 @@ if(!uId){
   updatePeople: async (req, res) => {
     const { id, name, assign } = req.body;
     try {
-
       const check = await People.findById(ObjectId(id));
 
-
       if (check) {
-      
-          const result = await People.updateOne(
-            {
-              _id: req.body.id,
+        const result = await People.updateOne(
+          {
+            _id: req.body.id,
+          },
+          {
+            $set: {
+              approved: true,
             },
-            {
-              $set: {
-                approved:true,
-              },
-            }
-          );
-          console.log(result);
-          return res.json({ status: true, message: "Accepted" });
+          }
+        );
+        console.log(result);
+        return res.json({ status: true, message: "Accepted" });
       } else {
         return res.status(404).json({ status: false, message: "not found" });
       }
@@ -106,10 +104,6 @@ if(!uId){
       return res.status(400).json({ status: false, message: error.message });
     }
   },
-
-  
-
-
 
   // ! __________________________________________DELETE FINCTION____________________________
 
