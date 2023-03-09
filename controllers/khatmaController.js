@@ -44,15 +44,15 @@ const khatmaCtrl = {
 
     try {
       let count = await Khatma.count();
-      let checked = await Khatma.count({ "juzes.checked": true });
+      let checked = await Khatma.findOne({ _id: ObjectId(KhatmaId)}).count({ "juzes.checked": true });
  
-      
+
 
       time = await Khatma.findOne({ _id: ObjectId(KhatmaId) })
         .populate("juzes.user", "-__v -email -password -isAdmin -noId")
         .select("-__v");
 
-
+        
         if (checked === 30) {
           time.finished = true;
         }
@@ -66,8 +66,8 @@ const khatmaCtrl = {
         status: true,
         message: "Success",
         Khatma: time,
-        length: checked,
-        checkedCount: count,
+        length: 30,
+        checkedCount: checked,
       });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
