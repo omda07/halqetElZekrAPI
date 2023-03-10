@@ -290,7 +290,7 @@ const khatmaCtrl = {
           },
           {
             $set: {
-              "juzes.$.user": req.body.userId,
+              "juzes.$.user": user.id,
               // checks: {
 
               //   ckecked: req.body.ckecked,
