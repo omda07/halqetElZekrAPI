@@ -9,11 +9,11 @@ const khatmaCtrl = require("../controllers/khatmaController");
 
 // ____________________________GETTING_________________________________
 
-router.get("/allRoom", khatmaCtrl.getRooms);
+router.get("/allRoom", [auth,khatmaCtrl.getRooms]);
 router.get("/roomById", [auth, khatmaCtrl.getRoomById]);
 
 // get CheckIn middleware
-router.get("/allKhatma", khatmaCtrl.getKhatma);
+router.get("/allKhatma", [auth,khatmaCtrl.getKhatma]);
 // router.get("/userKhatma", [auth, khatmaCtrl.getUserKhatma]);
 router.get("/khatmaById", [auth, khatmaCtrl.getKhatmaById]);
 // get CheckOut middleware
@@ -32,17 +32,17 @@ router.get("/khatmaById", [auth, khatmaCtrl.getKhatmaById]);
 //* ________________________________CREATE_________________________________________
 
 // Creating one Course
-router.post("/newKhatma",  khatmaCtrl.createKhatma);
+router.post("/newKhatma",  [auth,khatmaCtrl.createKhatma]);
 
 //* _________________________________CREATE ROOM____________________________________________
-router.post("/newRoom",  khatmaCtrl.createRoom);
+router.post("/newRoom",  [auth,khatmaCtrl.createRoom]);
 
 // router.post('/newCheckOut', [auth,timeCtrl.createCheckOut])
 
 //? ____________________________________UPDATE____________________________________________
 
-router.patch('/updateRoom', [khatmaCtrl.updateRoom])
-router.patch('/updateJuz', [khatmaCtrl.updateJuz])
+router.patch('/updateRoom', [auth,khatmaCtrl.updateRoom])
+router.patch('/updateJuz', [auth,khatmaCtrl.updateJuz])
 
 router.patch('/updateRemoveKhatmaAssignee', [auth,khatmaCtrl.updateRemoveKhatmaAssignee])
 

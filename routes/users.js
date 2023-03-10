@@ -9,19 +9,19 @@ const admin = require("../middleware/admin");
 //*______________________________GETTIG_____________________________
 
 //* middleware auth check first if user loged in and have a token
-router.get("/profile", auth, userCtrl.profile);
+router.get("/profile",[ auth, userCtrl.profile]);
 
 // Getting Author Contents
-router.get("/profile/:id", userCtrl.getUserId);
+router.get("/profile/:id", [auth,userCtrl.getUserId]);
 
 // Getting all
-router.get("/allUsers", userCtrl.allUsers);
+router.get("/allUsers",[auth, userCtrl.allUsers]);
 
 // Getting users count
-router.get("/usersCount", userCtrl.getUserCount);
+router.get("/usersCount", [auth,userCtrl.getUserCount]);
 
 // Getting user
-router.get("/getUser/:search", userCtrl.getUser);
+router.get("/getUser/:search", [auth,userCtrl.getUser]);
 
 //* ____________________________________________CREATING_______________________________
 

@@ -108,7 +108,7 @@ const khatmaCtrl = {
     try {
 
       time = await Room.findOne({ _id: ObjectId(roomId) })
-   .populate('khatma','-__v -juzes')
+   .populate('khatma users','-__v -juzes -password')
         .select("-__v");
 
 
@@ -318,7 +318,7 @@ const khatmaCtrl = {
 
       const check = await Room.findById(ObjectId(id));
 
-      console.log(check);
+      console.log(user.id);
       if (check) {
         const result = await Room.updateOne(
           {
@@ -328,7 +328,7 @@ const khatmaCtrl = {
           },
           {
             $addToSet: {
-              "users": req.body.userId,
+              "users": user.id,
               // checks: {
 
               //   ckecked: req.body.ckecked,
