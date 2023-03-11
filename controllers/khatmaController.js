@@ -291,7 +291,7 @@ const khatmaCtrl = {
             },
             {
               $set: {
-                "juzes.$.user": user.id,
+                "juzes.$.checked": true,
                 // checks: {
   
                 //   ckecked: req.body.ckecked,
@@ -299,7 +299,7 @@ const khatmaCtrl = {
               },
             }
           );
-        
+    
           return res.status(200).json({ status: true, message: "Accepted" });
         }else if(checkDone === 'false'){
           const result = await Khatma.updateOne(
