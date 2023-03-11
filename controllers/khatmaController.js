@@ -274,32 +274,57 @@ const khatmaCtrl = {
 
   updateJuz: async (req, res) => {
     const { id, juzId } = req.body;
+    const checkDone = req.query.checkDone;
     const token = req.header("x-auth-token");
     try {
       const user = jwt.verify(token, "privateKey");
 
       const check = await Khatma.findById(ObjectId(id));
 
-      console.log(check);
       if (check) {
-        const result = await Khatma.updateOne(
-          {
-            _id: req.body.id,
-            juzes: { $elemMatch: { _id: req.body.juzId } },
-            // "checks._id": req.body.checksId ,
-          },
-          {
-            $set: {
-              "juzes.$.user": user.id,
-              // checks: {
-
-              //   ckecked: req.body.ckecked,
-              // },
+        if(checkDone === 'true'){
+          const result = await Khatma.updateOne(
+            {
+              _id: req.body.id,
+              juzes: { $elemMatch: { _id: req.body.juzId } },
+              // "checks._id": req.body.checksId ,
             },
-          }
-        );
-        console.log(result);
-        return res.json({ status: true, message: "Accepted" });
+            {
+              $set: {
+                "juzes.$.user": user.id,
+                // checks: {
+  
+                //   ckecked: req.body.ckecked,
+                // },
+              },
+            }
+          );
+        
+          return res.status(200).json({ status: true, message: "Accepted" });
+        }else if(checkDone === 'false'){
+          const result = await Khatma.updateOne(
+            {
+              _id: req.body.id,
+              juzes: { $elemMatch: { _id: req.body.juzId } },
+              // "checks._id": req.body.checksId ,
+            },
+            {
+              $set: {
+                "juzes.$.user": user.id,
+                // checks: {
+  
+                //   ckecked: req.body.ckecked,
+                // },
+              },
+            }
+          );
+    
+          return res.status(200).json({ status: true, message: "Accepted" });
+        }else{
+          return res.status(400).json({ status: true, message: "حدث خطأ" });
+
+        }
+      
       } else {
         return res.status(404).json({ status: false, message: "not found" });
       }
