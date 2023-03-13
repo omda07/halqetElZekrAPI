@@ -9,7 +9,7 @@ const roomSchema = new mongoose.Schema(
     },
     imageUrl:{
       type: String,
-      default:"https://res.cloudinary.com/halqetelzekr/image/upload/v1678663005/placeholder_gqi3pm.jpg"
+      default:"https://res.cloudinary.com/halqetelzekr/image/upload/v1678732276/placeholder_t7jyyi.png"
     },
     cloudinary_id: { type: String, },
 
