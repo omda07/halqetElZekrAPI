@@ -1,12 +1,37 @@
 const express = require("express");
 
 const router = express.Router();
+const multer  = require('multer');
 
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
+const uploadImage = require("../middleware/uploadImage");
+
 
 const khatmaCtrl = require("../controllers/khatmaController");
 
+//* define storage for the images
+
+const storage = multer.diskStorage({
+    //destination for files
+    destination: function (request, file, callback) {
+      callback(null, './uploads');
+    },
+  
+    //add back the extension
+    filename: function (request, file, callback) {
+      callback(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
+    },
+  });
+
+//* upload parameters for multer
+const upload = multer({
+    storage: storage,
+    limits: {
+      fieldSize: 1024 * 1024 * 3,
+    },
+  });
+  
 // ____________________________GETTING_________________________________
 
 router.get("/allRoom", [auth,khatmaCtrl.getRooms]);
@@ -45,6 +70,7 @@ router.patch('/updateRoom', [auth,khatmaCtrl.updateRoom])
 router.patch('/updateJuz', [auth,khatmaCtrl.updateJuz])
 
 router.patch('/updateRemoveKhatmaAssignee', [auth,khatmaCtrl.updateRemoveKhatmaAssignee])
+router.put('/uploadRoom', [upload.single('imageUrl'), auth, khatmaCtrl.uploadRoom])
 
 // router.patch('/acceptCheckOut', [auth,timeCtrl.updateAcceptanceCheckOut])
 

@@ -14,6 +14,7 @@ const cors = require("cors");
 //* initial start
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 //* mongoose connection
 

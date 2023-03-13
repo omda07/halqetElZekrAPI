@@ -1,10 +1,11 @@
 const Khatma = require("../models/khatma_model");
 const Room = require("../models/room_model");
 
-
 const jwt = require("jsonwebtoken");
 
 const mongoose = require("mongoose");
+const cloudinary = require('./cloudinary')
+
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -25,14 +26,12 @@ const khatmaCtrl = {
           .json({ status: false, message: "Cannot find Khatmas" });
       }
 
-      return res
-        .status(200)
-        .json({
-          status: true,
-          message: "Success",
-          Khatma: time,
-          count: count,
-        });
+      return res.status(200).json({
+        status: true,
+        message: "Success",
+        Khatma: time,
+        count: count,
+      });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
@@ -44,18 +43,17 @@ const khatmaCtrl = {
 
     try {
       let count = await Khatma.count();
-      let checked = await Khatma.findOne({ _id: ObjectId(KhatmaId)}).count({ "juzes.checked": true });
- 
-
+      let checked = await Khatma.findOne({ _id: ObjectId(KhatmaId) }).count({
+        "juzes.checked": true,
+      });
 
       time = await Khatma.findOne({ _id: ObjectId(KhatmaId) })
         .populate("juzes.user", "-__v -email -password -isAdmin -noId")
         .select("-__v");
 
-        
-        if (checked === 30) {
-          time.finished = true;
-        }
+      if (checked === 30) {
+        time.finished = true;
+      }
       if (!time) {
         return res
           .status(404)
@@ -88,14 +86,12 @@ const khatmaCtrl = {
           .json({ status: false, message: "Cannot find Rooms" });
       }
 
-      return res
-        .status(200)
-        .json({
-          status: true,
-          message: "Success",
-          room: time,
-          count: count,
-        });
+      return res.status(200).json({
+        status: true,
+        message: "Success",
+        room: time,
+        count: count,
+      });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
     }
@@ -106,11 +102,9 @@ const khatmaCtrl = {
     const roomId = req.query.roomId;
 
     try {
-
       time = await Room.findOne({ _id: ObjectId(roomId) })
-   .populate('khatma users','-__v -juzes -password')
+        .populate("khatma users", "-__v -juzes -password")
         .select("-__v");
-
 
       if (!time) {
         return res
@@ -194,7 +188,7 @@ const khatmaCtrl = {
           },
           {
             $push: {
-              "khatma": newOrder._id,
+              khatma: newOrder._id,
               // checks: {
 
               //   ckecked: req.body.ckecked,
@@ -203,7 +197,6 @@ const khatmaCtrl = {
           }
         );
         console.log(result);
-        
       } else {
         return res.status(404).json({ status: false, message: "not found" });
       }
@@ -221,9 +214,6 @@ const khatmaCtrl = {
   },
 
   // ? ______________________________________UPDATE FUNCTION_____________________________
-
-
-
 
   // updateChecks: async (req, res) => {
   //   const { id,checksId } = req.body;
@@ -282,7 +272,7 @@ const khatmaCtrl = {
       const check = await Khatma.findById(ObjectId(id));
 
       if (check) {
-        if(checkDone === 'true'){
+        if (checkDone === "true") {
           const result = await Khatma.updateOne(
             {
               _id: req.body.id,
@@ -293,15 +283,15 @@ const khatmaCtrl = {
               $set: {
                 "juzes.$.checked": true,
                 // checks: {
-  
+
                 //   ckecked: req.body.ckecked,
                 // },
               },
             }
           );
-    
+
           return res.status(200).json({ status: true, message: "Accepted" });
-        }else if(checkDone === 'false'){
+        } else if (checkDone === "false") {
           const result = await Khatma.updateOne(
             {
               _id: req.body.id,
@@ -312,19 +302,17 @@ const khatmaCtrl = {
               $set: {
                 "juzes.$.user": user.id,
                 // checks: {
-  
+
                 //   ckecked: req.body.ckecked,
                 // },
               },
             }
           );
-    
-          return res.status(200).json({ status: true, message: "Accepted" });
-        }else{
-          return res.status(400).json({ status: true, message: "حدث خطأ" });
 
+          return res.status(200).json({ status: true, message: "Accepted" });
+        } else {
+          return res.status(400).json({ status: true, message: "حدث خطأ" });
         }
-      
       } else {
         return res.status(404).json({ status: false, message: "not found" });
       }
@@ -333,8 +321,42 @@ const khatmaCtrl = {
       return res.status(400).json({ status: false, message: error.message });
     }
   },
+  uploadRoom: async (req, res) => {
+    const  id  = req.query.id;
+    const token = req.header("x-auth-token");
 
-  
+    const imageUrl = req.file;
+    console.log(imageUrl);
+    try {
+      const user = jwt.verify(token, "privateKey");
+      const check = await Room.findById({ _id: id, users: user.id });
+      if (!check) {
+        return res.status(401).json({ status: false, message: "Not Allowed" });
+      }
+      const result = await cloudinary.uploader.upload(imageUrl.path, {
+        public_id: `${id}_avatar${Date.now()}`,
+        folder: "avatar",
+        width: 1024,
+        height: 1024,
+        crop: "fill",
+      });
+      console.log(result);
+      const updatedRoom = await Room.findByIdAndUpdate(
+        id,
+        { imageUrl: result.url },
+        { new: true }
+      );
+      return res
+        .status(201)
+        .json({ status: true, message: "Your profile has updated!" });
+    } catch (error) {
+      console.log("Error while uploading profile image", error);
+      return res
+        .status(500)
+        .json({ status: false, message: "server error, try after some time" });
+    }
+  },
+
   updateRoom: async (req, res) => {
     const { id, juzId } = req.body;
     const token = req.header("x-auth-token");
@@ -353,7 +375,7 @@ const khatmaCtrl = {
           },
           {
             $addToSet: {
-              "users": user.id,
+              users: user.id,
               // checks: {
 
               //   ckecked: req.body.ckecked,
